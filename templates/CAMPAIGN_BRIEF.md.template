@@ -1,0 +1,37 @@
+# Campaign Brief — [CAMPAIGN NAME]
+**Generated:** [DATE]
+
+## Flight
+- **Dates:** [START] → [END]
+- **Total budget:** ₹[AMOUNT]
+- **Budget split:** [e.g. 70% Students / 30% Lawyers]
+- **Geography:** [e.g. All India]
+
+## Goal
+- **Conversion event:** [e.g. student_signup]
+- **Target CPA:** ₹[AMOUNT]
+- **Conversion action on page:** [what the user does]
+- **Conversion tag:** [AW-ID/LABEL or "Not yet set up"]
+
+## Audience
+- **Who:** [2-sentence description]
+- **Audience signals:** [comma-separated or "None"]
+- **Search themes:** [comma-separated or "None"]
+
+## Landing
+- **URL:** [https://...]
+
+## Creative
+- **Available:** [describe what you have]
+
+## Context
+- **Previous learnings:** [from prior campaigns]
+- **Hard constraints:** [what must NOT be done]
+
+---
+## LLM Council Review
+_Filled by /ads-council — do not edit manually._
+
+**Status:** PENDING COUNCIL REVIEW
+
+Run `/ads-council` in Claude Code to get a GO / NO-GO verdict.

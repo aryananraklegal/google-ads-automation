@@ -1,0 +1,8 @@
+secrets/
+review/
+*.pyc
+__pycache__/
+.env
+*.yaml
+*.yml
+!*.template.yaml
