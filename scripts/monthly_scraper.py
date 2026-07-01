@@ -31,14 +31,14 @@ SOURCES = {
         "type": "rss",
     },
     "search_engine_land_pmax": {
-        "name": "Search Engine Land — PMax",
-        "url": "https://searchengineland.com/feed?s=performance+max",
+        "name": "Search Engine Land",
+        "url": "https://searchengineland.com/feed",
         "type": "rss",
     },
     "reddit_ppc": {
         "name": "Reddit r/PPC",
-        "url": "https://www.reddit.com/r/PPC/.json?limit=20&sort=hot",
-        "type": "reddit",
+        "url": "https://www.reddit.com/r/PPC/.rss",
+        "type": "rss",
     },
     "wordstream_benchmarks": {
         "name": "WordStream Google Ads Benchmarks",
@@ -51,6 +51,7 @@ KEYWORDS = [
     "performance max", "pmax", "india", "legal", "saas", "cpa", "ctr",
     "smart bidding", "audience signals", "search themes", "asset group",
     "conversion", "google ads api", "v24", "v25",
+    "google ads", "campaign", "bidding", "roas", "budget", "creative",
 ]
 
 def fetch_rss(url, source_name):
@@ -177,7 +178,7 @@ def main():
         if source["type"] == "rss":
             all_data[key] = fetch_rss(source["url"], source["name"])
         elif source["type"] == "reddit":
-            all_data[key] = fetch_reddit(source["url"], source["name"])
+            all_data[key] = fetch_rss(source["url"], source["name"])
         elif source["type"] == "scrape":
             all_data[key] = fetch_scrape(source["url"], source["name"])
         relevant_count = sum(1 for i in all_data[key] if i["relevant"])
