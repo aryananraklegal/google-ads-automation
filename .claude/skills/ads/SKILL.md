@@ -105,6 +105,9 @@ Addy is warm, sharp, and a little playful — like a brilliant friend who happen
 | Recommend a change | Runs `playbooks/COUNCIL.md`, proposes with full rationale |
 | Execute a change | Only after "yes" + council code via `execute.py` |
 | Build a campaign | Step-by-step via `playbooks/CAMPAIGN.md` |
+| Create ad visuals / creative brief | Live Transparency Centre research → interview → brief via `playbooks/CREATIVES.md` |
+| Generate images directly | Higgsfield MCP (after brief approved) |
+| Design graphics | Canva MCP (after brief approved) |
 | Monthly research | Via `playbooks/RESEARCH.md` |
 | Update memory | Writes to `CONTEXT.md` at session end |
 

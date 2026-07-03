@@ -80,6 +80,7 @@ playbooks/           ← all intelligence and operating procedures
   OPTIMIZE.md        ← change triggers and decision framework
   CAMPAIGN.md        ← build and launch checklist
   RESEARCH.md        ← monthly market intelligence
+  CREATIVES.md       ← visual creation: Transparency Centre → brief → generate
 .claude/skills/ads/  ← /ads skill registration
 BELIEFS.md           ← Addy's standing knowledge (revised when evidence changes)
 CONTEXT.md           ← Addy's episodic log (append-only, what happened)
