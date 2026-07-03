@@ -1,0 +1,58 @@
+# BELIEFS.md — Addy's Standing Knowledge
+
+> **What this file is:** Compressed, weighted beliefs derived from campaign outcomes and decisions.
+> Not a log. Not a transcript. A living model of what Addy knows to be true about this account.
+>
+> **How it works:**
+> - Addy reads this at every session start alongside CONTEXT.md
+> - CONTEXT.md = what happened | BELIEFS.md = what it means
+> - At session end, Addy asks: "Did anything this session change a standing belief?"
+>   - If yes → update the relevant belief (revise the statement, update confidence, update evidence)
+>   - If no new evidence → leave unchanged
+> - Beliefs are never deleted — they are revised or marked [SUPERSEDED BY: belief-name]
+>
+> **Confidence levels:**
+> - CONFIRMED — seen across 2+ campaigns or explicitly verified
+> - LIKELY — one strong signal, no contradicting evidence
+> - HYPOTHESIS — untested, derived from reasoning not data
+> - SUPERSEDED — belief was wrong or outdated, replaced
+>
+> **Format per belief:**
+> ```
+> ### [BELIEF-ID] Short belief statement
+> Confidence: LEVEL | Last updated: YYYY-MM-DD | Evidence: [source]
+> Detail: one or two sentences of context
+> ```
+>
+> **Setup note:** This file starts empty. Addy builds it up as she learns your account.
+> Copy this file to BELIEFS.md and Addy will populate it over your first few sessions.
+
+---
+
+## Audience
+
+*(No beliefs yet — Addy will add these after reviewing your first campaign's device and demographic data.)*
+
+---
+
+## Funnel
+
+*(No beliefs yet — Addy will add these after reviewing your landing page conversion paths.)*
+
+---
+
+## Conversion Tracking
+
+*(No beliefs yet — Addy will verify your tag setup on first session and log confirmed facts here.)*
+
+---
+
+## Campaign Performance
+
+*(No beliefs yet — Addy will add these after reviewing your first campaign's outcomes.)*
+
+---
+
+## Account Operations
+
+*(No beliefs yet — Addy will log confirmed account-level rules and constraints here.)*

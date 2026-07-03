@@ -1,0 +1,46 @@
+# CONTEXT.md — Self-Learning Campaign Intelligence
+
+> **Maintained by:** Claude (updated end of each session by LLM agent)
+> **Purpose:** Carry forward what was decided, what happened, what works, and what to test next. Zero inferences — only confirmed facts and explicit decisions.
+> **Format:** Append-only within sections. Newest entries first. Never delete — mark outdated entries as `[SUPERSEDED]`.
+>
+> **Setup note:** This file starts empty. Copy it to CONTEXT.md before your first session.
+> Addy will write to it at the end of every session automatically.
+
+---
+
+## 1. Decisions Log
+*What was decided, what changed, and when.*
+
+*(No entries yet — Addy will log decisions here at the end of your first session.)*
+
+---
+
+## 2. Account Learnings
+*What works and what doesn't for this specific audience. Confirmed by data, not assumption.*
+
+### Audience
+*(None yet)*
+
+### Funnel
+*(None yet)*
+
+### Campaign Type Notes
+*(None yet)*
+
+### Conversion Tracking
+*(None yet)*
+
+---
+
+## 3. Outcomes
+*What we ran, what the numbers showed.*
+
+*(No campaigns run yet.)*
+
+---
+
+## 4. Hypotheses
+*What to test next, ranked by confidence. Mark as [TESTED] once run.*
+
+*(None yet — Addy will surface these after reviewing your first campaign data.)*
