@@ -33,8 +33,9 @@ Short version:
 ```bash
 pip install google-ads pyyaml
 cp config.yaml.example config.yaml       # fill in your account details
-cp BELIEFS.md.example BELIEFS.md         # Addy builds this up over sessions
-cp CONTEXT.md.example CONTEXT.md         # session log, starts blank
+cp BELIEFS.md.example BELIEFS.md                 # Addy builds this up over sessions
+cp CONTEXT.md.example CONTEXT.md                 # session log, starts blank
+cp CREATIVE_BELIEFS.md.example CREATIVE_BELIEFS.md  # visual memory, loaded during creative work only
 # place google-ads.yaml in secrets/      # see SETUP.md for OAuth steps
 python api.py campaigns                  # verify connection
 ```
@@ -70,10 +71,12 @@ See SETUP.md → "Push Alerting" for cron / Task Scheduler setup.
 
 ```
 CLAUDE.md               Addy's operating rules + account constants
-BELIEFS.md              Addy's standing knowledge — gitignored, stays local
-BELIEFS.md.example      Blank template for new accounts
-CONTEXT.md              Addy's session log — gitignored, stays local
-CONTEXT.md.example      Blank template for new accounts
+BELIEFS.md                  Addy's standing knowledge — gitignored, stays local
+BELIEFS.md.example          Blank template for new accounts
+CONTEXT.md                  Addy's session log — gitignored, stays local
+CONTEXT.md.example          Blank template for new accounts
+CREATIVE_BELIEFS.md         Visual/creative memory — gitignored, loaded by CREATIVES.md only
+CREATIVE_BELIEFS.md.example Blank template for new accounts
 SETUP.md                First-time setup guide
 config.yaml             Your account config — gitignored, stays local
 config.yaml.example     Template for new accounts

@@ -6,6 +6,16 @@
 
 ---
 
+## Step 0 — Load creative memory (always first)
+
+Before anything else, read `CREATIVE_BELIEFS.md`.
+
+This file holds what's been learned across all previous creative sessions — prompt patterns that work, formats that got Best labels, CTAs that council approved, competitor visual patterns already researched. Reading it means we don't repeat mistakes or redo research we've already done.
+
+If `CREATIVE_BELIEFS.md` doesn't exist yet: copy `CREATIVE_BELIEFS.md.example` to `CREATIVE_BELIEFS.md` and proceed. Addy will populate it over the first few sessions.
+
+---
+
 ## When to use this playbook
 
 - User asks Addy to help create or brief images/videos for a campaign
@@ -183,6 +193,19 @@ Once Kapil has the final images:
 4. Addy logs the asset names, upload date, and brief summary in `review/YYYY-MM-DD_creatives.md`
 5. Schedule a check-in: pull `api.get_creatives()` after 14 days to see if labels have assigned
 6. If any asset comes back "Low" within 30 days — flag it and run this playbook again for replacement
+
+---
+
+## Step 7 — Update CREATIVE_BELIEFS.md
+
+At the end of every creative session, ask the 5 update questions in CREATIVE_BELIEFS.md:
+- Higgsfield prompt worked or flopped?
+- Asset labels assigned since last session?
+- Council vetoed a copy angle or CTA?
+- Transparency Centre research revealed a visual pattern?
+- A brand constraint caused a production problem?
+
+Revise beliefs in place. Add new ones with the next CR-ID. Write nothing if no evidence changed.
 
 ---
 

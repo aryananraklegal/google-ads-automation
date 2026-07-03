@@ -97,6 +97,7 @@ use_proto_plus: True
 cp config.yaml.example config.yaml
 cp BELIEFS.md.example BELIEFS.md
 cp CONTEXT.md.example CONTEXT.md
+cp CREATIVE_BELIEFS.md.example CREATIVE_BELIEFS.md
 mkdir -p visuals/brand visuals/generated visuals/screenshots
 ```
 

@@ -1,0 +1,104 @@
+# CREATIVE_BELIEFS.md — Addy's Visual Intelligence
+
+> **Loaded by:** `playbooks/CREATIVES.md` only — NOT at morning brief startup.
+> **Purpose:** Retain what works and what flops specifically for this brand's creative production.
+> Zero trial-and-error repetition across sessions.
+>
+> **How it works:**
+> - Addy reads this at the START of every CREATIVES.md session (before Step 1)
+> - At the END of a creative session, Addy asks: did anything change a standing belief?
+>   - If yes → revise in place, update confidence + date
+>   - If no → write nothing
+> - Log of what was tried/failed goes in `review/YYYY-MM-DD_creatives.md`
+>   This file only holds compressed beliefs — not a session transcript
+>
+> **Confidence levels:** CONFIRMED / LIKELY / HYPOTHESIS / SUPERSEDED
+>
+> **Format:**
+> ```
+> ### [CR-ID] Short belief statement
+> Confidence: LEVEL | Last updated: YYYY-MM-DD | Evidence: [source]
+> Detail: one or two sentences
+> ```
+
+---
+
+## Brand Constraints
+
+### [CR-01] Logo requires a white or light background — transparent/dark backgrounds bleed
+Confidence: HYPOTHESIS | Last updated: 2026-07-03 | Evidence: Standard brand guideline — not yet tested in Higgsfield
+Detail: AnrakLegal logo has dark elements that disappear on dark overlays. Always place on white or very light background. Validate on first Higgsfield run and update confidence.
+
+### [CR-02] Product UI screenshots need breathing room — tight crops lose context
+Confidence: HYPOTHESIS | Last updated: 2026-07-03 | Evidence: UI design inference — not yet tested
+Detail: The product interface (chat, feed, case tools) needs surrounding whitespace to read clearly at ad thumbnail scale. Full-bleed UI crops likely render as noise. Test on first creative session.
+
+---
+
+## Higgsfield Prompt Engineering
+
+### [CR-03] No confirmed prompt patterns yet — first creative session will establish baseline
+Confidence: HYPOTHESIS | Last updated: 2026-07-03 | Evidence: No Higgsfield sessions run yet
+Detail: First session should test: clean minimal legal tech aesthetic vs bold B2B vs warm human. Log which renders closest to brief. Update this section with working prompt structures after that session.
+
+*Template for what to log here after first session:*
+```
+### [CR-0X] "[prompt phrase]" produces [result description]
+Confidence: CONFIRMED | Last updated: YYYY-MM-DD | Evidence: Higgsfield session YYYY-MM-DD
+Detail: Works for [format]. Fails for [format]. Negative prompt that helped: "[text]"
+```
+
+---
+
+## Format Performance
+
+### [CR-04] No format performance data yet — PMax asset labels not assigned
+Confidence: HYPOTHESIS | Last updated: 2026-07-03 | Evidence: No campaigns with correct tracking have run yet
+Detail: Once Campaign 03 runs and Google assigns asset labels (Good/Best/Low), log which formats (landscape 1200×628, square 1200×1200, portrait 960×1200) perform best for students vs lawyers. This section should fill up within 14 days of Campaign 03 launch.
+
+*Template for what to log here:*
+```
+### [CR-0X] [Format] performs [better/worse] for [audience] audience
+Confidence: CONFIRMED | Last updated: YYYY-MM-DD | Evidence: api.get_creatives() — asset label report
+Detail: Label assigned: [Good/Best/Low]. Notes on why (copy angle, visual style, CTA).
+```
+
+---
+
+## Copy & CTA
+
+### [CR-05] No copy performance data yet — establish baseline in Campaign 03
+Confidence: HYPOTHESIS | Last updated: 2026-07-03 | Evidence: No conversion data from campaigns with correct tracking
+Detail: Headline angles to test in Campaign 03: benefit-led ("Draft contracts in minutes"), social proof ("Used by 500+ Indian law firms"), fear/urgency ("Missing a deadline costs more than software"). Log which angle gets Best label.
+
+### [CR-06] CTAs approved by council for student audience: "Try free" and "Start today"
+Confidence: LIKELY | Last updated: 2026-07-03 | Evidence: CAMPAIGN_BRIEF.md — Aug 2026 draft
+Detail: "Book a demo" was considered too high-friction for students. "Try free" aligns with the free-tier entry point. Update to CONFIRMED once an ad with this CTA runs and produces clicks.
+
+---
+
+## Competitor Visual Patterns (from Transparency Centre)
+
+### [CR-07] No competitor research completed yet — run browser research before first creative session
+Confidence: HYPOTHESIS | Last updated: 2026-07-03 | Evidence: CREATIVES.md Step 2 not yet executed
+Detail: First session must complete Transparency Centre research per CREATIVES.md Step 2. Log dominant visual patterns found here so future sessions don't repeat the research from scratch.
+
+*Template for what to log here:*
+```
+### [CR-0X] [Competitor/space] dominates with [visual pattern] — opportunity gap is [alternative]
+Confidence: CONFIRMED | Last updated: YYYY-MM-DD | Evidence: adstransparency.google.com — search "[term]"
+Detail: Screenshots saved to visuals/screenshots/YYYY-MM-DD_[term].png
+```
+
+---
+
+## What Addy does with this file at session end
+
+After every creative session, ask:
+1. Did a Higgsfield prompt work well or fail badly? → Update CR-03 or add a new CR entry
+2. Did Google assign asset labels since last session? → Update CR-04 or add format entries
+3. Did council veto a copy angle or CTA? → Add to CR-05/CR-06
+4. Did Transparency Centre research reveal a clear visual pattern? → Update CR-07 or add entry
+5. Did a brand constraint cause a problem (logo, UI crop, colours)? → Update CR-01/CR-02
+
+If none of the above → write nothing. Only update when evidence actually changes the model.

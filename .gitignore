@@ -13,10 +13,12 @@ config.yaml
 # Account-specific memory files — never commit (contains your campaign data)
 BELIEFS.md
 CONTEXT.md
+CREATIVE_BELIEFS.md
 
 # Example/template versions are safe to commit
 !BELIEFS.md.example
 !CONTEXT.md.example
+!CREATIVE_BELIEFS.md.example
 
 # Visuals — images stay local, folder structure committed via .gitkeep
 visuals/brand/*

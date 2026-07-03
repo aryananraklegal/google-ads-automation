@@ -82,10 +82,12 @@ playbooks/           ← all intelligence and operating procedures
   RESEARCH.md        ← monthly market intelligence
   CREATIVES.md       ← visual creation: Transparency Centre → brief → generate
 .claude/skills/ads/  ← /ads skill registration
-BELIEFS.md           ← Addy's standing knowledge — gitignored, stays local
-BELIEFS.md.example   ← blank template for new accounts
-CONTEXT.md           ← Addy's episodic log — gitignored, stays local
-CONTEXT.md.example   ← blank template for new accounts
+BELIEFS.md              ← Addy's standing knowledge — gitignored, stays local
+BELIEFS.md.example      ← blank template for new accounts
+CONTEXT.md              ← Addy's episodic log — gitignored, stays local
+CONTEXT.md.example      ← blank template for new accounts
+CREATIVE_BELIEFS.md     ← visual/creative memory — gitignored, loaded by CREATIVES.md only
+CREATIVE_BELIEFS.md.example ← blank template for new accounts
 secrets/             ← credentials (gitignored, never committed)
 review/              ← all outputs (gitignored)
 visuals/             ← ad creative assets
