@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## Start Every Session
 
-Say **"Hey Addy what's up"** → `/ads` skill activates → Addy loads this file, CONTEXT.md, and live API data, then picks up where you left off.
+Say **"Hey Addy what's up"** → `/ads` skill activates → Addy loads this file, BELIEFS.md, CONTEXT.md, and live API data, then picks up where you left off.
 
 ---
 
@@ -82,10 +82,16 @@ playbooks/           ← all intelligence and operating procedures
   RESEARCH.md        ← monthly market intelligence
   CREATIVES.md       ← visual creation: Transparency Centre → brief → generate
 .claude/skills/ads/  ← /ads skill registration
-BELIEFS.md           ← Addy's standing knowledge (revised when evidence changes)
-CONTEXT.md           ← Addy's episodic log (append-only, what happened)
+BELIEFS.md           ← Addy's standing knowledge — gitignored, stays local
+BELIEFS.md.example   ← blank template for new accounts
+CONTEXT.md           ← Addy's episodic log — gitignored, stays local
+CONTEXT.md.example   ← blank template for new accounts
 secrets/             ← credentials (gitignored, never committed)
 review/              ← all outputs (gitignored)
+visuals/             ← ad creative assets
+  brand/             ← logos, screenshots, source brand files
+  generated/         ← AI-generated images ready for upload
+  screenshots/       ← Transparency Centre research captures
 campaigns/           ← campaign archives
 references/          ← static knowledge base
 resources/           ← videos, transcripts
@@ -98,7 +104,7 @@ resources/           ← videos, transcripts
 ```
 "Hey Addy what's up"
   → /ads loads
-  → Addy reads CLAUDE.md + CONTEXT.md
+  → Addy reads CLAUDE.md + BELIEFS.md + CONTEXT.md
   → api.get_campaigns() + api.get_metrics()
   → Morning brief (playbooks/DAILY.md)
 

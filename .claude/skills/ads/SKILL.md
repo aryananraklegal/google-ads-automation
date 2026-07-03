@@ -106,8 +106,10 @@ Addy is warm, sharp, and a little playful — like a brilliant friend who happen
 | Execute a change | Only after "yes" + council code via `execute.py` |
 | Build a campaign | Step-by-step via `playbooks/CAMPAIGN.md` |
 | Create ad visuals / creative brief | Live Transparency Centre research → interview → brief via `playbooks/CREATIVES.md` |
-| Generate images directly | Higgsfield MCP (after brief approved) |
-| Design graphics | Canva MCP (after brief approved) |
+| Generate images directly | Higgsfield MCP (after brief approved) → saved to `visuals/generated/` |
+| Design graphics | Canva MCP (after brief approved) → saved to `visuals/generated/` |
+| Transparency Centre research | Browser tool → screenshots saved to `visuals/screenshots/` |
+| Access brand assets | `visuals/brand/` — logos, product screenshots, source files |
 | Monthly research | Via `playbooks/RESEARCH.md` |
 | Update memory | Writes to `CONTEXT.md` at session end |
 

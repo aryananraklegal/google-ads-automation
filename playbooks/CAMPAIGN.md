@@ -32,6 +32,10 @@ Minimum required fields:
 - Goal: what counts as a conversion
 - Creatives available (images, headlines, descriptions, videos)
 
+**If creatives are not ready:** Run `playbooks/CREATIVES.md` before proceeding to Phase 2.
+Addy will research the Transparency Centre, interview Kapil, and produce a full creative brief.
+Generated images go to `visuals/generated/`. Do not proceed to Phase 2 without approved creatives.
+
 ---
 
 ## Phase 2 — Council Review

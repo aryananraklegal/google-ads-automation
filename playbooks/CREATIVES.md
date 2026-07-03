@@ -174,10 +174,15 @@ If Kapil wants Addy to generate directly using the connected MCP tools, she can 
 
 Once Kapil has the final images:
 
-1. Upload to Google Ads asset group via UI (Addy cannot upload images via API — Google Ads API does not support image upload for PMax asset groups)
-2. Addy logs the asset names, upload date, and brief summary in `review/YYYY-MM-DD_creatives.md`
-3. Schedule a check-in: pull `api.get_creatives()` after 14 days to see if labels have assigned
-4. If any asset comes back "Low" within 30 days — flag it and run this playbook again for replacement
+1. Save generated images to `visuals/generated/[campaign-label]/` using this naming convention:
+   `YYYY-MM-DD_[campaign-label]_[format]_v[N].png`
+   Example: `2026-08-01_PMax-Students_landscape_v1.png`
+2. Save Transparency Centre browser screenshots to `visuals/screenshots/`:
+   `YYYY-MM-DD_[search-term].png`
+3. Upload to Google Ads asset group via UI (Addy cannot upload images via API — Google Ads API does not support image upload for PMax asset groups)
+4. Addy logs the asset names, upload date, and brief summary in `review/YYYY-MM-DD_creatives.md`
+5. Schedule a check-in: pull `api.get_creatives()` after 14 days to see if labels have assigned
+6. If any asset comes back "Low" within 30 days — flag it and run this playbook again for replacement
 
 ---
 

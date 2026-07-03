@@ -92,4 +92,5 @@ OR: "Skipped — no live web retrieval available."
 ```
 
 Save to `review/YYYY-MM_research.md`.
-Summarise grounded findings only in CONTEXT.md under Account Learnings.
+Summarise grounded findings in CONTEXT.md under Account Learnings.
+If any finding confirms, contradicts, or adds nuance to a standing belief, update BELIEFS.md accordingly — revise the belief in place, update confidence level and evidence source.

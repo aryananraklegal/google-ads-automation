@@ -91,11 +91,21 @@ use_proto_plus: True
 
 ---
 
-## Step 3 — Fill in config.yaml
+## Step 3 — Set up local files
 
 ```bash
 cp config.yaml.example config.yaml
+cp BELIEFS.md.example BELIEFS.md
+cp CONTEXT.md.example CONTEXT.md
+mkdir -p visuals/brand visuals/generated visuals/screenshots
 ```
+
+- `config.yaml` — your account config (gitignored, stays local)
+- `BELIEFS.md` — Addy's standing knowledge, starts blank, she builds it up over sessions (gitignored)
+- `CONTEXT.md` — Addy's session log, starts blank (gitignored)
+- `visuals/` — folder for brand assets and generated creatives
+
+Drop your logo and brand screenshots into `visuals/brand/`.
 
 Edit config.yaml:
 - `account.customer_id` — find this in Google Ads UI, top right (format: 123-456-7890, enter without dashes)

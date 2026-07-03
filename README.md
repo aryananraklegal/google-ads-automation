@@ -8,7 +8,7 @@ Built for AnrakLegal. Works for any Google Ads account.
 
 ## What Addy does
 
-- Loads your account memory and live campaign data every session
+- Loads account memory (BELIEFS.md + CONTEXT.md) and live campaign data every session
 - Flags threshold breaches, kill rule conditions, and conversion tracking issues
 - Projects 48 hours ahead — warns before things go wrong, not after
 - Runs a 4-layer LLM council (Budget / Creative / Conversion / Market experts) before every change
@@ -32,9 +32,11 @@ See **[SETUP.md](SETUP.md)** for the full guide. Estimated time: 30–45 minutes
 Short version:
 ```bash
 pip install google-ads pyyaml
-cp config.yaml.example config.yaml   # fill in your account details
-# place google-ads.yaml in secrets/  # see SETUP.md for OAuth steps
-python api.py campaigns               # verify connection
+cp config.yaml.example config.yaml       # fill in your account details
+cp BELIEFS.md.example BELIEFS.md         # Addy builds this up over sessions
+cp CONTEXT.md.example CONTEXT.md         # session log, starts blank
+# place google-ads.yaml in secrets/      # see SETUP.md for OAuth steps
+python api.py campaigns                  # verify connection
 ```
 
 ---
@@ -68,9 +70,12 @@ See SETUP.md → "Push Alerting" for cron / Task Scheduler setup.
 
 ```
 CLAUDE.md               Addy's operating rules + account constants
-CONTEXT.md              Addy's persistent memory (updated every session)
+BELIEFS.md              Addy's standing knowledge — gitignored, stays local
+BELIEFS.md.example      Blank template for new accounts
+CONTEXT.md              Addy's session log — gitignored, stays local
+CONTEXT.md.example      Blank template for new accounts
 SETUP.md                First-time setup guide
-config.yaml             Your account config (gitignored)
+config.yaml             Your account config — gitignored, stays local
 config.yaml.example     Template for new accounts
 api.py                  Read-only Google Ads API connector
 execute.py              Write connector (requires council code)
@@ -83,7 +88,14 @@ playbooks/              Addy's operating procedures
   OPTIMIZE.md           Change triggers and decision framework
   CAMPAIGN.md           Build and launch checklist
   RESEARCH.md           Monthly market intelligence
+  CREATIVES.md          Visual creation: Transparency Centre → brief → generate
 .claude/skills/ads/     /ads skill (invokes Addy)
+visuals/                Ad creative assets
+  brand/                Logos, screenshots, source brand files
+  generated/            AI-generated images ready for upload
+  screenshots/          Transparency Centre research captures
+secrets/                Credentials — gitignored, never committed
+review/                 All session outputs — gitignored, stays local
 campaigns/              Campaign archives
 references/             Static knowledge base
 ```
