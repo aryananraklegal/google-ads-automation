@@ -56,7 +56,8 @@ playbooks/           ← all intelligence and operating procedures
   CAMPAIGN.md        ← build and launch checklist
   RESEARCH.md        ← monthly market intelligence
 .claude/skills/ads/  ← /ads skill registration
-CONTEXT.md           ← Addy's memory (updated end of every session)
+BELIEFS.md           ← Addy's standing knowledge (revised when evidence changes)
+CONTEXT.md           ← Addy's episodic log (append-only, what happened)
 secrets/             ← credentials (gitignored, never committed)
 review/              ← all outputs (gitignored)
 campaigns/           ← campaign archives

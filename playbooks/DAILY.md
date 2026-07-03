@@ -19,12 +19,13 @@ Do not continue with a session if the config would cause a silent failure downst
 
 ## Step 2 — Load Memory
 
-Read `CONTEXT.md` — decisions log, learnings, open hypotheses.
-Note the date of the last session. Note any pending actions that weren't completed.
+Read in this order:
 
-**IMPORTANT:** Treat CONTEXT.md facts as starting context, not ground truth.
-Campaign status, conversion counts, and funnel details in CONTEXT.md can be stale.
-Always verify with a live api.py call before acting on them.
+**`BELIEFS.md` first** — standing knowledge about this account. Compressed, weighted beliefs derived from all prior campaigns. Use these as the baseline understanding of how this account behaves. If a belief is CONFIRMED, treat it as true unless live API data contradicts it.
+
+**`CONTEXT.md` second** — episodic log. What happened recently, what's pending, what changed last session. Note the date of the last session and any open blockers (e.g. PR #84 status).
+
+**Cross-reference rule:** If live API data contradicts a BELIEF, the API wins. Note the contradiction — it becomes a BELIEFS.md update at session end.
 
 ---
 
