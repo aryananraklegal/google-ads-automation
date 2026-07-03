@@ -3,6 +3,9 @@ review/
 *.pyc
 __pycache__/
 .env
-*.yaml
-*.yml
-!*.template.yaml
+
+# Real account config — never commit (contains customer IDs)
+config.yaml
+
+# Example config is safe to commit — no credentials, placeholder IDs only
+!config.yaml.example

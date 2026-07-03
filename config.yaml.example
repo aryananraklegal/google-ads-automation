@@ -1,0 +1,43 @@
+# Addy — Account Configuration Example
+# Copy this to config.yaml and fill in your account details.
+# config.yaml is gitignored. Never commit it.
+
+account:
+  customer_id: "YOUR_CUSTOMER_ID"     # Sub-account ID only. Find in Google Ads top-right.
+  name: "Your Company Name"
+
+campaigns:
+  - resource_name: "customers/YOUR_CUSTOMER_ID/campaigns/CAMPAIGN_ID"
+    label: "PMax-Audience-MonthYear"   # Human label for logs
+    audience: "students"               # or "lawyers" or your segment name
+    budget_resource: "customers/YOUR_CUSTOMER_ID/campaignBudgets/BUDGET_ID"
+    asset_group: "customers/YOUR_CUSTOMER_ID/assetGroups/ASSET_GROUP_ID"
+    landing_page: "/your-landing-page"
+
+conversions:
+  - id: "CONVERSION_ACTION_ID"
+    label: "CONVERSION_LABEL"
+    name: "Human name for logs"
+    send_to: "AW-TAG_ID/LABEL"
+
+shared_sets:
+  negative_list: "customers/YOUR_CUSTOMER_ID/sharedSets/SHARED_SET_ID"
+
+audiences:
+  all_visitors: "customers/YOUR_CUSTOMER_ID/userLists/USER_LIST_ID"
+
+thresholds:
+  kill:
+    min_days: 14
+    student_min_spend_inr: 3000
+    lawyer_min_spend_inr: 5000
+  cpa_targets:
+    student_inr: 150
+    lawyer_inr: 600
+  budget_change_max_pct: 50
+  bid_strategy_change_max_pct: 15
+  bidding_phase:
+    growth_min_conversions: 15
+    growth_window_days: 30
+    optimize_min_conversions: 30
+    optimize_window_days: 30
