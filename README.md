@@ -1,81 +1,99 @@
-# Google Ads Automation
+# Addy — Google Ads Operator
 
-A self-contained package for running high-frequency Google Ads campaigns with Claude Code. Built for Anrak Legal, usable by anyone.
+Addy is an AI-powered Google Ads operator built on Claude Code. She monitors your campaigns, surfaces what needs attention, runs a 4-layer council review before any change, and executes only after your explicit confirmation.
 
-**What it does:**
-- Daily campaign monitoring with threshold flags
-- Monthly market intelligence scraping
-- Pre-campaign interview → structured brief
-- 4-layer LLM council: GO / NO-GO verdict before any action
-
-**What it does NOT do:**
-- Make any campaign changes without your explicit confirmation
-- Store your credentials or review data in this repo
+Built for AnrakLegal. Works for any Google Ads account.
 
 ---
 
-## Install (5 minutes)
+## What Addy does
 
+- Loads your account memory and live campaign data every session
+- Flags threshold breaches, kill rule conditions, and conversion tracking issues
+- Projects 48 hours ahead — warns before things go wrong, not after
+- Runs a 4-layer LLM council (Budget / Creative / Conversion / Market experts) before every change
+- Executes changes via Google Ads API with a date-locked confirmation code
+- Logs every action with a rollback record before mutating
+- Sends push alerts via email when campaigns need attention (even when you're not in a session)
+
+## What Addy never does
+
+- Makes any change without your explicit "yes"
+- Cites industry benchmarks without a live source URL
+- Uses the same confirmation code twice
+- Touches the Google Ads API without a valid council code
+
+---
+
+## Setup
+
+See **[SETUP.md](SETUP.md)** for the full guide. Estimated time: 30–45 minutes.
+
+Short version:
 ```bash
-git clone https://github.com/anrakprojects/google-ads-automation
-cd google-ads-automation
-python setup.py
+pip install google-ads pyyaml
+cp config.yaml.example config.yaml   # fill in your account details
+# place google-ads.yaml in secrets/  # see SETUP.md for OAuth steps
+python api.py campaigns               # verify connection
 ```
-
-Setup wizard will:
-1. Install dependencies
-2. Walk you through Google Cloud OAuth setup (step-by-step)
-3. Collect your credentials and write them locally
-4. Generate a `CLAUDE.md` for your account
-5. Verify the API connection
-
-**Prerequisite:** Python 3.10+. That's it.
 
 ---
 
 ## Daily use
 
+Open Claude Code in this folder:
 ```bash
-# Morning check
-python scripts/daily_monitor.py
-
-# New campaign (start here)
-python scripts/campaign_interview.py
-
-# Monthly (run once a month)
-python scripts/monthly_scraper.py
+claude
 ```
 
-Then open Claude Code in this folder: `claude`
+Say: **"Hey Addy what's up"**
 
-The LLM council runs automatically when needed. Invoke manually with `/ads-council`.
-
----
-
-## What you need from Google
-
-1. **Developer token** — Google Ads > Admin > API Center
-2. **Google Cloud project** with Google Ads API enabled (setup wizard walks you through this)
-3. **OAuth 2.0 credentials** — Client ID + Secret from Google Cloud Console
-4. **Customer ID** — your Google Ads account ID (not a manager account)
+That's it. Addy handles the rest.
 
 ---
 
-## Security
+## Push alerting (optional)
 
-- `secrets/` is gitignored. Never committed.
-- `review/` is gitignored. Local only.
-- Scripts are read-only against the Google Ads API. Zero write calls.
-- All campaign actions require explicit confirmation.
+Schedule `monitor.py` to run daily — it checks live metrics and emails you if anything needs attention.
+
+```bash
+python monitor.py   # test it
+```
+
+See SETUP.md → "Push Alerting" for cron / Task Scheduler setup.
 
 ---
 
 ## Structure
 
 ```
-scripts/          Python monitoring + interview scripts
-skills/           Claude Code skills (domain experts + council)
-references/       Benchmark docs, PMax guides
-templates/        CAMPAIGN_BRIEF.md template
-council/          Council orchestration logic
+CLAUDE.md               Addy's operating rules + account constants
+CONTEXT.md              Addy's persistent memory (updated every session)
+SETUP.md                First-time setup guide
+config.yaml             Your account config (gitignored)
+config.yaml.example     Template for new accounts
+api.py                  Read-only Google Ads API connector
+execute.py              Write connector (requires council code)
+monitor.py              Push alerting engine
+validate_config.py      Session-start config validation
+playbooks/              Addy's operating procedures
+  DAILY.md              Morning check routine
+  INTERVIEW.md          Campaign brief questionnaire
+  COUNCIL.md            4-layer review + confirmation code
+  OPTIMIZE.md           Change triggers and decision framework
+  CAMPAIGN.md           Build and launch checklist
+  RESEARCH.md           Monthly market intelligence
+.claude/skills/ads/     /ads skill (invokes Addy)
+campaigns/              Campaign archives
+references/             Static knowledge base
 ```
+
+---
+
+## Security
+
+- `secrets/` is gitignored — credentials never committed
+- `review/` is gitignored — outputs stay local
+- `config.yaml` is gitignored — account IDs stay local
+- Every write operation requires a council confirmation code matching today's date
+- Confirmation codes are single-use — replay rejected in code
