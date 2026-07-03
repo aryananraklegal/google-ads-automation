@@ -17,3 +17,12 @@ CONTEXT.md
 # Example/template versions are safe to commit
 !BELIEFS.md.example
 !CONTEXT.md.example
+
+# Visuals — images stay local, folder structure committed via .gitkeep
+visuals/brand/*
+visuals/generated/*
+visuals/screenshots/*
+!visuals/brand/.gitkeep
+!visuals/generated/.gitkeep
+!visuals/screenshots/.gitkeep
+!visuals/README.md
