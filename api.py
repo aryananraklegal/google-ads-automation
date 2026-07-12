@@ -8,6 +8,7 @@ No logic. No write operations. Returns structured data + saves to review/.
 
 import sys
 import json
+from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -111,7 +112,9 @@ def get_metrics(start_date: str = None, end_date: str = None) -> dict:
             metrics.cost_micros,
             metrics.conversions,
             metrics.ctr,
-            metrics.average_cpc
+            metrics.average_cpc,
+            metrics.cost_per_conversion,
+            metrics.conversions_from_interactions_rate
         FROM campaign
         WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
         AND campaign.status != 'REMOVED'
@@ -128,6 +131,9 @@ def get_metrics(start_date: str = None, end_date: str = None) -> dict:
         c = row.campaign
         cost_inr = round(m.cost_micros / 1_000_000, 2)
         cpc_inr = round(m.average_cpc / 1_000_000, 2)
+        # cost_per_conversion is Google's own CPA. It is 0 when conversions are 0,
+        # which would read as "free" rather than "no data" — surface None instead.
+        cpa_inr = round(m.cost_per_conversion / 1_000_000, 2) if m.conversions else None
 
         entry = {
             "campaign": c.name,
@@ -138,12 +144,15 @@ def get_metrics(start_date: str = None, end_date: str = None) -> dict:
             "conversions": m.conversions,
             "ctr_pct": round(m.ctr * 100, 2),
             "avg_cpc_inr": cpc_inr,
+            "cpa_inr": cpa_inr,
+            "cvr_pct": round(m.conversions_from_interactions_rate * 100, 2),
         }
         results.append(entry)
         lines.append(f"## {c.name} ({c.status.name})")
         lines.append(f"- Clicks: {m.clicks} | Impressions: {m.impressions} | CTR: {entry['ctr_pct']}%")
         lines.append(f"- Spend: {cost_inr} | Avg CPC: {cpc_inr}")
-        lines.append(f"- Conversions: {m.conversions}\n")
+        lines.append(f"- Conversions: {m.conversions} | CVR: {entry['cvr_pct']}%")
+        lines.append(f"- CPA: {cpa_inr if cpa_inr is not None else 'no conversions'}\n")
 
     _save(f"{end_date}_metrics.md", "\n".join(lines))
     return {"date_range": f"{start_date} to {end_date}", "campaigns": results}
@@ -203,8 +212,63 @@ def get_search_terms(start_date: str = None, end_date: str = None) -> dict:
 # 3. ASSET / CREATIVE PERFORMANCE
 # ---------------------------------------------------------------------------
 
+# Minimum impressions before an asset is judged on conversions rather than left
+# in LEARNING. This account converts at roughly 0.2% of impressions, so an asset
+# needs several hundred impressions before "zero conversions" means anything.
+# Set too low, every under-served asset is labelled LOW and looks prunable.
+CREATIVE_MIN_IMPRESSIONS = 500
+
+CREATIVE_CAVEAT = (
+    "PMax credits an asset for every conversion from any combination it appeared in. "
+    "Asset conversions therefore OVERLAP and do NOT sum to the campaign total. "
+    "Use them to rank assets against each other, never to attribute volume."
+)
+
+
+def _label_creatives(entries: list) -> None:
+    """Assign a relative performance label in place, within each field type.
+
+    Google removed asset_group_asset.performance_label in v24, so we derive the
+    equivalent from live metrics. Assets are ranked against their own field type
+    (a HEADLINE only competes with other HEADLINEs) by conversions, then by
+    conversion rate. Terciles map to BEST / GOOD / LOW, mirroring Google's labels.
+    """
+    groups = defaultdict(list)
+    for e in entries:
+        groups[(e["campaign"], e["asset_group"], e["field_type"])].append(e)
+
+    for members in groups.values():
+        for e in members:
+            e["cvr"] = (e["conversions"] / e["impressions"]) if e["impressions"] else 0.0
+
+        judged = [e for e in members if e["impressions"] >= CREATIVE_MIN_IMPRESSIONS]
+        for e in members:
+            if e not in judged:
+                e["performance_label"] = "LEARNING"
+
+        if not judged:
+            continue
+
+        # An asset that has been served enough and still converts nobody is LOW,
+        # regardless of where it ranks. The rest split BEST / GOOD by conversions.
+        converters = [e for e in judged if e["conversions"] > 0]
+        for e in judged:
+            if e["conversions"] == 0:
+                e["performance_label"] = "LOW"
+
+        converters.sort(key=lambda e: (e["conversions"], e["cvr"]), reverse=True)
+        cut = max(1, len(converters) // 3)
+        for rank, e in enumerate(converters):
+            e["performance_label"] = "BEST" if rank < cut else "GOOD"
+
+
 def get_creatives(start_date: str = None, end_date: str = None) -> dict:
-    """Fetch asset group asset performance labels."""
+    """Fetch PMax asset group assets with derived performance labels.
+
+    Replaces the v24-removed asset_group_asset.performance_label with labels
+    derived from live per-asset metrics. See CREATIVE_CAVEAT on why the
+    conversion column does not add up to the campaign total.
+    """
     start_date, end_date = _default_dates(start_date, end_date)
     _validate_dates(start_date, end_date)
 
@@ -213,36 +277,91 @@ def get_creatives(start_date: str = None, end_date: str = None) -> dict:
         SELECT
             asset_group_asset.asset,
             asset_group_asset.field_type,
-            asset_group_asset.performance_label,
+            asset_group_asset.status,
+            asset_group_asset.primary_status,
+            asset_group_asset.policy_summary.approval_status,
             asset_group.name,
-            campaign.name
+            campaign.name,
+            asset.type,
+            asset.source,
+            asset.text_asset.text,
+            asset.youtube_video_asset.youtube_video_id,
+            metrics.impressions,
+            metrics.clicks,
+            metrics.conversions,
+            metrics.cost_micros
         FROM asset_group_asset
         WHERE campaign.status != 'REMOVED'
+        AND asset_group_asset.status != 'REMOVED'
         AND segments.date BETWEEN '{start_date}' AND '{end_date}'
         ORDER BY asset_group.name
     """
 
     rows = _run_query(client, customer_id, query)
 
-    lines = [f"# Creative Performance: {start_date} to {end_date}\n"]
     results = []
-
     for row in rows:
-        aga = row.asset_group_asset
-        entry = {
-            "asset_group": row.asset_group.name,
+        aga, asset, m = row.asset_group_asset, row.asset, row.metrics
+        results.append({
             "campaign": row.campaign.name,
+            "asset_group": row.asset_group.name,
             "field_type": aga.field_type.name,
-            "performance_label": aga.performance_label.name,
+            "asset_type": asset.type_.name,
+            "auto_generated": asset.source.name == "AUTOMATICALLY_CREATED",
+            "approval_status": aga.policy_summary.approval_status.name,
+            "primary_status": aga.primary_status.name,
+            "content": (
+                asset.text_asset.text
+                or asset.youtube_video_asset.youtube_video_id
+                or ""
+            ),
+            "impressions": m.impressions,
+            "clicks": m.clicks,
+            "conversions": m.conversions,
+            "cost_inr": round(m.cost_micros / 1_000_000, 2),
             "asset": aga.asset,
-        }
-        results.append(entry)
+        })
+
+    _label_creatives(results)
+
+    disapproved = [e for e in results if e["approval_status"] not in ("APPROVED", "UNSPECIFIED", "UNKNOWN")]
+    auto_gen = [e for e in results if e["auto_generated"]]
+    low = [e for e in results if e["performance_label"] == "LOW"]
+
+    order = {"BEST": 0, "GOOD": 1, "LOW": 2, "LEARNING": 3}
+    results.sort(key=lambda e: (e["asset_group"], e["field_type"], order[e["performance_label"]]))
+
+    lines = [
+        f"# Creative Performance: {start_date} to {end_date}\n",
+        f"> NOTE: {CREATIVE_CAVEAT}\n",
+        f"Assets: {len(results)} | LOW: {len(low)} | "
+        f"auto-generated: {len(auto_gen)} | disapproved: {len(disapproved)}\n",
+    ]
+    for e in results:
+        flags = ""
+        if e["auto_generated"]:
+            flags += " [AUTO-GEN]"
+        if e in disapproved:
+            flags += f" [{e['approval_status']}]"
         lines.append(
-            f"- [{entry['performance_label']}] {entry['field_type']} | {entry['asset_group']}"
+            f"- [{e['performance_label']}] {e['field_type']} | "
+            f"imp={e['impressions']} clk={e['clicks']} conv={e['conversions']:.0f} "
+            f"cost=INR{e['cost_inr']}{flags}\n"
+            f"    {e['content'][:70]}"
         )
 
     _save(f"{end_date}_creatives.md", "\n".join(lines))
-    return {"date_range": f"{start_date} to {end_date}", "assets": results}
+    return {
+        "date_range": f"{start_date} to {end_date}",
+        "caveat": CREATIVE_CAVEAT,
+        "counts": {
+            "total": len(results),
+            "low": len(low),
+            "auto_generated": len(auto_gen),
+            "disapproved": len(disapproved),
+        },
+        "assets": results,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -396,6 +515,151 @@ def get_bidding_phase_status(window_days: int = 30) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# 7. PMAX SEARCH TERM INSIGHTS
+# ---------------------------------------------------------------------------
+
+# PMax traffic never lands in search_term_view (that resource is Search-network
+# only). Google's PMax equivalent is campaign_search_term_insight, which buckets
+# queries into categories for privacy — raw search terms are only exposed within
+# a category, and only once that category has enough volume. Treat this as
+# directional theme signal, not the literal query list Search campaigns get.
+PMAX_SEARCH_TERM_CAVEAT = (
+    "PMax does not report into search_term_view. campaign_search_term_insight "
+    "buckets queries into categories for privacy — individual search terms are "
+    "only visible within a category, and only once that category has enough "
+    "volume. This is directional theme signal, not a literal query list."
+)
+
+# campaign_search_term_insight requires REQUIRES_FILTER_BY_SINGLE_RESOURCE, and
+# fetching the terms under a category costs one extra API call per category —
+# cap how many categories get the term-level lookup so this stays a handful of
+# calls, not one per category on a large account.
+PMAX_CATEGORY_TERM_FETCH_LIMIT = 20
+
+
+def _resolve_single_enabled_pmax_campaign(client, customer_id: str) -> int:
+    query = """
+        SELECT campaign.id, campaign.name
+        FROM campaign
+        WHERE campaign.status = 'ENABLED'
+        AND campaign.advertising_channel_type = 'PERFORMANCE_MAX'
+    """
+    rows = _run_query(client, customer_id, query)
+    matches = [(r.campaign.id, r.campaign.name) for r in rows]
+    if len(matches) == 0:
+        raise ValueError("No ENABLED PMax campaign found — pass campaign_id explicitly.")
+    if len(matches) > 1:
+        names = ", ".join(f"{n} ({i})" for i, n in matches)
+        raise ValueError(f"Multiple ENABLED PMax campaigns found ({names}) — pass campaign_id explicitly.")
+    return matches[0][0]
+
+
+def get_pmax_search_terms(campaign_id: int = None, start_date: str = None, end_date: str = None) -> dict:
+    """Fetch Performance Max search-term category insights.
+
+    Two-step GAQL: campaign_search_term_insight must be filtered to exactly one
+    campaign_id (REQUIRES_FILTER_BY_SINGLE_RESOURCE), and the underlying search
+    terms per category require a second query filtered by that category's
+    insight id. If campaign_id is omitted, auto-resolves to the single ENABLED
+    PMax campaign; raises if there's zero or more than one.
+    """
+    start_date, end_date = _default_dates(start_date, end_date)
+    _validate_dates(start_date, end_date)
+
+    client, customer_id = _get_client()
+
+    if campaign_id is None:
+        campaign_id = _resolve_single_enabled_pmax_campaign(client, customer_id)
+
+    category_query = f"""
+        SELECT
+            campaign_search_term_insight.campaign_id,
+            campaign_search_term_insight.category_label,
+            campaign_search_term_insight.id,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.conversions,
+            metrics.conversions_value
+        FROM campaign_search_term_insight
+        WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
+        AND campaign_search_term_insight.campaign_id = {campaign_id}
+        ORDER BY metrics.clicks DESC
+    """
+    category_rows = _run_query(client, customer_id, category_query)
+
+    categories = []
+    for row in category_rows:
+        csi, m = row.campaign_search_term_insight, row.metrics
+        categories.append({
+            "insight_id": csi.id,
+            "category_label": csi.category_label or "(uncategorized)",
+            "clicks": m.clicks,
+            "impressions": m.impressions,
+            "conversions": m.conversions,
+            "conversions_value": m.conversions_value,
+        })
+
+    top_categories = categories[:PMAX_CATEGORY_TERM_FETCH_LIMIT]
+    dropped = len(categories) - len(top_categories)
+
+    for cat in top_categories:
+        term_query = f"""
+            SELECT
+                segments.search_term,
+                segments.search_subcategory,
+                metrics.impressions,
+                metrics.conversions,
+                metrics.conversions_value
+            FROM campaign_search_term_insight
+            WHERE campaign_search_term_insight.campaign_id = {campaign_id}
+            AND campaign_search_term_insight.id = {cat['insight_id']}
+            AND segments.date BETWEEN '{start_date}' AND '{end_date}'
+        """
+        # Google rejects ORDER BY when segmenting by segments.search_term — sort client-side instead.
+        term_rows = _run_query(client, customer_id, term_query)
+        cat["terms"] = sorted(
+            (
+                {
+                    "term": r.segments.search_term,
+                    "impressions": r.metrics.impressions,
+                    "conversions": r.metrics.conversions,
+                }
+                for r in term_rows
+            ),
+            key=lambda t: t["impressions"],
+            reverse=True,
+        )
+
+    lines = [
+        f"# PMax Search Term Insights: {start_date} to {end_date} (campaign {campaign_id})\n",
+        f"> NOTE: {PMAX_SEARCH_TERM_CAVEAT}\n",
+    ]
+    if dropped > 0:
+        lines.append(
+            f"> {dropped} lower-traffic categories omitted from term-level lookup "
+            f"(top {PMAX_CATEGORY_TERM_FETCH_LIMIT} by clicks shown).\n"
+        )
+    for cat in top_categories:
+        lines.append(
+            f"## {cat['category_label']} — {cat['clicks']} clicks | "
+            f"{cat['conversions']:.0f} conv"
+        )
+        for t in cat["terms"][:10]:
+            lines.append(f"- `{t['term']}` | {t['impressions']} impr | {t['conversions']:.0f} conv")
+        lines.append("")
+
+    _save(f"{end_date}_pmax_search_terms.md", "\n".join(lines))
+    return {
+        "date_range": f"{start_date} to {end_date}",
+        "campaign_id": campaign_id,
+        "caveat": PMAX_SEARCH_TERM_CAVEAT,
+        "categories_total": len(categories),
+        "categories_fetched": len(top_categories),
+        "categories": top_categories,
+    }
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -407,6 +671,7 @@ if __name__ == "__main__":
     commands = {
         "metrics": lambda: get_metrics(start, end),
         "search_terms": lambda: get_search_terms(start, end),
+        "pmax_search_terms": lambda: get_pmax_search_terms(start_date=start, end_date=end),
         "creatives": lambda: get_creatives(start, end),
         "campaigns": lambda: get_campaigns(),
         "conversions": lambda: get_conversion_actions(),

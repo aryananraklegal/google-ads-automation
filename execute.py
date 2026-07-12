@@ -201,7 +201,6 @@ def _get_bid_strategy_current(client, customer_id: str, campaign_resource_name: 
         SELECT
             campaign.bidding_strategy_type,
             campaign.target_cpa.target_cpa_micros,
-            campaign.maximize_clicks.target_spend_micros,
             campaign.name
         FROM campaign
         WHERE campaign.resource_name = '{campaign_resource_name}'
@@ -241,7 +240,7 @@ def pause_campaign(campaign_resource_name: str, confirmation_code: str) -> dict:
     campaign.resource_name = campaign_resource_name
     campaign.status = client.enums.CampaignStatusEnum.PAUSED
     op = client.get_type("CampaignOperation")
-    op.update.CopyFrom(campaign)
+    client.copy_from(op.update, campaign)
     op.update_mask.paths.append("status")
 
     _mutate(
@@ -273,7 +272,7 @@ def enable_campaign(campaign_resource_name: str, confirmation_code: str) -> dict
     campaign.resource_name = campaign_resource_name
     campaign.status = client.enums.CampaignStatusEnum.ENABLED
     op = client.get_type("CampaignOperation")
-    op.update.CopyFrom(campaign)
+    client.copy_from(op.update, campaign)
     op.update_mask.paths.append("status")
 
     _mutate(
@@ -324,7 +323,7 @@ def set_budget(budget_resource_name: str, new_daily_inr: float, confirmation_cod
     budget.resource_name = budget_resource_name
     budget.amount_micros = new_micros
     op = client.get_type("CampaignBudgetOperation")
-    op.update.CopyFrom(budget)
+    client.copy_from(op.update, budget)
     op.update_mask.paths.append("amount_micros")
 
     _mutate(
@@ -350,11 +349,14 @@ def set_bid_strategy(
     strategy: str,
     confirmation_code: str,
     target_cpa_inr: float = None,
+    cpc_ceiling_inr: float = 50,
 ) -> dict:
     """
     Update campaign bid strategy.
     strategy: MAXIMIZE_CLICKS | MAXIMIZE_CONVERSIONS | TARGET_CPA
     target_cpa_inr: required when strategy = TARGET_CPA
+    cpc_ceiling_inr: max-CPC ceiling for MAXIMIZE_CLICKS (default 50). Required as a
+        leaf mask field — an empty TargetSpend message cannot be masked (FIELD_HAS_SUBFIELDS).
     """
     _validate_code(confirmation_code, f"set_bid_strategy:{campaign_resource_name}:{strategy}")
 
@@ -374,20 +376,29 @@ def set_bid_strategy(
     campaign = client.get_type("Campaign")
     campaign.resource_name = campaign_resource_name
 
+    # This client runs in proto-plus mode: set message fields by assignment, not CopyFrom.
+    # Message-typed strategies must be masked on a LEAF subfield, not the whole message
+    # (masking the empty message raises FIELD_HAS_SUBFIELDS). Setting a subfield of a
+    # bidding-strategy oneof member switches the campaign to that strategy.
     if strategy == "MAXIMIZE_CLICKS":
-        campaign.maximize_clicks.CopyFrom(client.get_type("MaximizeClicks"))
-        mask_field = "maximize_clicks"
+        # "Maximize clicks" in the UI is the TargetSpend strategy in the API.
+        ts = client.get_type("TargetSpend")
+        ts.cpc_bid_ceiling_micros = round(cpc_ceiling_inr * 1_000_000)
+        campaign.target_spend = ts
+        mask_field = "target_spend.cpc_bid_ceiling_micros"
     elif strategy == "MAXIMIZE_CONVERSIONS":
-        campaign.maximize_conversions.CopyFrom(client.get_type("MaximizeConversions"))
+        # NOTE: empty MaximizeConversions has the same masking limitation as TargetSpend.
+        # Set a leaf (e.g. target_roas) before using this branch on API v24.
+        campaign.maximize_conversions = client.get_type("MaximizeConversions")
         mask_field = "maximize_conversions"
     elif strategy == "TARGET_CPA":
         tcpa = client.get_type("TargetCpa")
         tcpa.target_cpa_micros = round(target_cpa_inr * 1_000_000)
-        campaign.target_cpa.CopyFrom(tcpa)
-        mask_field = "target_cpa"
+        campaign.target_cpa = tcpa
+        mask_field = "target_cpa.target_cpa_micros"
 
     op = client.get_type("CampaignOperation")
-    op.update.CopyFrom(campaign)
+    client.copy_from(op.update, campaign)
     op.update_mask.paths.append(mask_field)
 
     _mutate(
