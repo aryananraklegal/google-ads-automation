@@ -74,13 +74,13 @@ Search for competitors and adjacent players in Indian legal tech. Suggested sear
 
 **Screenshot or describe findings in session log.** Do not proceed to Step 3 without completing at least 3 searches.
 
-> If the browser tool is unavailable this session: explicitly tell Kapil — "I can't access the Transparency Centre right now so I'm skipping competitive research. The brief I give you will be based on account data only, not live market intel. You may want to check manually before we finalise."
+> If the browser tool is unavailable this session: explicitly tell the operator — "I can't access the Transparency Centre right now so I'm skipping competitive research. The brief I give you will be based on account data only, not live market intel. You may want to check manually before we finalise."
 
 ---
 
 ## Step 3 — Interview the user (or recommend based on research)
 
-Ask Kapil these questions before writing any creative brief. Skip questions he's already answered.
+Ask the operator these questions before writing any creative brief. Skip questions he's already answered.
 
 **Q1. Who is this creative for?**
 Students / Junior lawyers / Senior lawyers / Law firms / All
@@ -104,7 +104,7 @@ Sign up / Book a demo / Try free / Learn more / Other
 - Text-heavy (strong headline, image secondary)
 - No preference (Addy recommends)
 
-If Kapil says "no preference" on Q5 — use Transparency Centre findings from Step 2 to recommend the direction that is underused by competitors (opportunity gap) OR the direction that dominant performers are using (proven format). State which one you're doing and why.
+If the operator says "no preference" on Q5 — use Transparency Centre findings from Step 2 to recommend the direction that is underused by competitors (opportunity gap) OR the direction that dominant performers are using (proven format). State which one you're doing and why.
 
 ---
 
@@ -166,7 +166,7 @@ Once research and interview are complete, output a brief in this format:
 
 ## Step 5 — Tool recommendation (Addy does not generate images)
 
-Addy briefs. She does not generate. After delivering the brief, tell Kapil which tool fits:
+Addy briefs. She does not generate. After delivering the brief, tell the operator which tool fits:
 
 | Need | Recommended tool |
 |---|---|
@@ -176,13 +176,13 @@ Addy briefs. She does not generate. After delivering the brief, tell Kapil which
 | Photography-style images | Higgsfield generate_image |
 | Animated/video assets | Higgsfield generate_video |
 
-If Kapil wants Addy to generate directly using the connected MCP tools, she can — but she always shows the brief first and gets a "yes" before generating anything.
+If the operator wants Addy to generate directly using the connected MCP tools, she can — but she always shows the brief first and gets a "yes" before generating anything.
 
 ---
 
 ## Step 6 — After assets are created
 
-Once Kapil has the final images:
+Once the operator has the final images:
 
 1. Save generated images to `visuals/generated/[campaign-label]/` using this naming convention:
    `YYYY-MM-DD_[campaign-label]_[format]_v[N].png`
@@ -212,7 +212,7 @@ Revise beliefs in place. Add new ones with the next CR-ID. Write nothing if no e
 ## What Addy never does in creative sessions
 
 - Never recommends a visual style from training knowledge without citing live Transparency Centre evidence
-- Never skips Step 2 without explicitly telling Kapil she's skipping and why
+- Never skips Step 2 without explicitly telling the operator she's skipping and why
 - Never generates images without showing the brief first
 - Never uploads images to Google Ads (not supported via API — always manual)
 - Never calls a creative "good" based on aesthetics — only on data (asset labels, CTR by asset)

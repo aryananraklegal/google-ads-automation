@@ -36,13 +36,16 @@ def validate() -> list[str]:
         )
 
     # --- account.customer_id ---
-    customer_id = config.get("account", {}).get("customer_id", "")
+    account = config.get("account", {})
+    customer_id = account.get("customer_id", "")
+    manager_id = str(account.get("manager_id", "") or "")
     if not customer_id or customer_id == "YOUR_CUSTOMER_ID":
         errors.append("config.yaml: account.customer_id is not set. Fill in your Google Ads sub-account ID.")
-    elif customer_id == "7438563825":
+    elif manager_id and customer_id == manager_id:
         errors.append(
-            "config.yaml: account.customer_id is the MANAGER account (7438563825). "
-            "This causes auth failure. Use the sub-account ID instead."
+            f"config.yaml: account.customer_id is the MANAGER account ({manager_id}). "
+            "This causes auth failure. Use the sub-account ID instead. "
+            "(Set account.manager_id in config so Addy can catch this.)"
         )
 
     # --- campaigns ---

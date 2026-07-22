@@ -5,6 +5,20 @@
 account:
   customer_id: "YOUR_CUSTOMER_ID"     # Sub-account ID only. Find in Google Ads top-right.
   name: "Your Company Name"
+  manager_id: ""                      # OPTIONAL. Your MCC/manager account ID, if you have one.
+                                      # Used only to warn if you accidentally put it in customer_id
+                                      # above (manager IDs cause auth failure). Leave blank if none.
+
+operator:
+  name: "Operator"                    # Who Addy is working with. Addy addresses you by this name.
+                                      # e.g. "Priya". Replaces the old hardcoded operator name.
+
+connected_product:                    # OPTIONAL. The website/app whose conversions these ads drive.
+  name: ""                            # e.g. "YourApp" — leave blank if not applicable
+  repo: ""                            # e.g. github URL of the product (Addy never edits it directly;
+                                      # she produces file+line diffs for you to apply)
+  conversion_routing: ""              # free-text note on where each conversion fires, e.g.
+                                      # "Signup: /welcome page load fires AW-XXXX/LABEL"
 
 campaigns:
   - resource_name: "customers/YOUR_CUSTOMER_ID/campaigns/CAMPAIGN_ID"
@@ -22,6 +36,17 @@ conversions:
 
 shared_sets:
   negative_list: "customers/YOUR_CUSTOMER_ID/sharedSets/SHARED_SET_ID"
+
+campaign_rules:
+  match_types: "Exact and Phrase only. No Broad Match."   # your match-type policy
+  # Negatives are maintained in the Google Ads Shared Library; listed here so Addy knows them.
+  # These are EXAMPLES — replace with negatives relevant to your product/market.
+  negatives_general: []               # e.g. [free, template, DIY, jobs, salary, course]
+  negatives_competitors: []           # e.g. [competitorA, competitorB]
+  demographic_exclusions: ""          # e.g. "18-24 age bracket" or leave blank
+  ad_schedule: ""                     # e.g. "Mon-Fri 9AM-6PM IST" or leave blank
+  location: ""                        # e.g. "India, Presence Only"
+  device_note: ""                     # e.g. "Mobile-first — 99.8% mobile observed"
 
 audiences:
   all_visitors: "customers/YOUR_CUSTOMER_ID/userLists/USER_LIST_ID"

@@ -110,6 +110,10 @@ Drop your logo and brand screenshots into `visuals/brand/`.
 
 Edit config.yaml:
 - `account.customer_id` — find this in Google Ads UI, top right (format: 123-456-7890, enter without dashes)
+- `account.manager_id` — your MCC/manager ID if you have one (optional; lets Addy warn if you mix it up with customer_id)
+- `operator.name` — your name; Addy addresses you by it
+- `connected_product` — fill in only if these ads drive conversions on a site/app you own (else leave blank)
+- `campaign_rules` — your match-type policy, negative keyword lists, exclusions, schedule, location
 - Campaign resource names — run `python api.py campaigns` after Step 4 to get these
 - Conversion action IDs — run `python api.py conversions` after Step 4
 
@@ -212,6 +216,6 @@ Expected output: either "All clear" or a list of alerts. Check `review/YYYY-MM-D
 | `FileNotFoundError: config.yaml` | Not copied from example | `cp config.yaml.example config.yaml` |
 | `FileNotFoundError: secrets/google-ads.yaml` | Credentials not placed | Follow Step 2 |
 | `AuthenticationError` | Wrong refresh token or client creds | Re-run Step 2d |
-| `AuthorizationError: Customer not found` | Using manager account ID | Use sub-account ID (not 7438563825) |
+| `AuthorizationError: Customer not found` | Using manager account ID | Use the sub-account ID, not your MCC/manager ID. Set `account.manager_id` in config so Addy warns you if you mix them up. |
 | `ValueError: Campaign not found` | Wrong resource name in config.yaml | Re-run `python api.py campaigns` and copy resource names |
 | `set_budget fails with budget_resource` | budget_resource blank in config.yaml | Get budget ID from Google Ads UI URL |

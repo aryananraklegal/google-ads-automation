@@ -13,7 +13,7 @@
 - [ ] Negative keyword list attached to campaign
 - [ ] Customer list audience uploaded (for audience signals)
 - [ ] All creatives approved — no disapproved assets
-- [ ] Budget confirmed by Kapil
+- [ ] Budget confirmed by the operator
 
 Do not proceed to Phase 1 until all boxes are checked. State each one explicitly.
 
@@ -33,7 +33,7 @@ Minimum required fields:
 - Creatives available (images, headlines, descriptions, videos)
 
 **If creatives are not ready:** Run `playbooks/CREATIVES.md` before proceeding to Phase 2.
-Addy will research the Transparency Centre, interview Kapil, and produce a full creative brief.
+Addy will research the Transparency Centre, interview the operator, and produce a full creative brief.
 Generated images go to `visuals/generated/`. Do not proceed to Phase 2 without approved creatives.
 
 ---

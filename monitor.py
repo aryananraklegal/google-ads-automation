@@ -66,9 +66,17 @@ def _check_metrics(metrics_data: dict, config: dict) -> list[Alert]:
     cpa_targets = t.get("cpa_targets", {})
     kill = t.get("kill", {})
 
+    # Audience names come from config campaigns (e.g. "students", "lawyers", "shoppers"),
+    # not hardcoded — keeps monitor.py account-agnostic. Threshold keys are built per
+    # audience (e.g. cpa_targets.<audience>_inr, kill.<audience>_min_spend_inr) with
+    # generic fallbacks, so an unrecognised audience still gets sane defaults.
+    known_audiences = {
+        str(c.get("audience", "")).rstrip("s").lower()
+        for c in config.get("campaigns", []) if c.get("audience")
+    }
     for camp in metrics_data.get("campaigns", []):
         name = camp["campaign"]
-        audience = "student" if "student" in name.lower() else "lawyer"
+        audience = next((a for a in known_audiences if a and a in name.lower()), None)
 
         # Budget utilisation — flag if spend is very low (api doesn't return budget directly,
         # so we flag 0 spend as a proxy for paused/starved campaign)
@@ -111,9 +119,14 @@ def _check_metrics(metrics_data: dict, config: dict) -> list[Alert]:
     return alerts
 
 
-def _check_conversions(conversion_data: dict) -> list[Alert]:
+def _check_conversions(conversion_data: dict, config: dict) -> list[Alert]:
     alerts = []
-    expected_ids = {"7660090544", "7660090547"}
+    # Expected conversion action IDs come from config.yaml, not hardcoded — keeps
+    # monitor.py account-agnostic. Add every conversion you want tracking-monitored
+    # under config.yaml `conversions:` with its `id`.
+    expected_ids = {str(c["id"]) for c in config.get("conversions", []) if c.get("id")}
+    if not expected_ids:
+        return alerts  # nothing configured to check
 
     active = {str(ca["id"]) for ca in conversion_data.get("conversion_actions", [])
               if ca["status"] == "ENABLED"}
@@ -226,7 +239,7 @@ def run():
 
     try:
         conversions = get_conversion_actions()
-        alerts += _check_conversions(conversions)
+        alerts += _check_conversions(conversions, config)
     except Exception as e:
         alerts.append(Alert("CRITICAL", "System", "api_conversions", "ERROR", "OK", str(e)))
 

@@ -122,7 +122,7 @@ Does this action require a corresponding action (e.g. enable campaign AND verify
 Final verdict:
 
 - **GO** — all experts SOUND, critics satisfied → generate confirmation code
-- **GO WITH CONDITIONS** → state conditions explicitly. Generate code only after Kapil agrees to each condition.
+- **GO WITH CONDITIONS** → state conditions explicitly. Generate code only after the operator agrees to each condition.
 - **NO-GO** → state blocker precisely. No code generated. What must change before re-submitting.
 
 ---

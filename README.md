@@ -2,7 +2,7 @@
 
 Addy is an AI-powered Google Ads operator built on Claude Code. She monitors your campaigns, surfaces what needs attention, runs a 4-layer council review before any change, and executes only after your explicit confirmation.
 
-Built for AnrakLegal. Works for any Google Ads account.
+Works for any Google Ads account — configure once in config.yaml.
 
 ---
 
