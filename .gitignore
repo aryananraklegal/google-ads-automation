@@ -32,3 +32,4 @@ visuals/screenshots/*
 # Real campaign data — stays local, keep repo a generic reusable template
 campaigns/
 CAMPAIGN_BRIEF_Lawyers_Search.md
+CAMPAIGN_BRIEF.md
