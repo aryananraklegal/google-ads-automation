@@ -28,3 +28,7 @@ visuals/screenshots/*
 !visuals/generated/.gitkeep
 !visuals/screenshots/.gitkeep
 !visuals/README.md
+
+# Real campaign data — stays local, keep repo a generic reusable template
+campaigns/
+CAMPAIGN_BRIEF_Lawyers_Search.md

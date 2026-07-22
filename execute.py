@@ -200,7 +200,9 @@ def _get_bid_strategy_current(client, customer_id: str, campaign_resource_name: 
     query = f"""
         SELECT
             campaign.bidding_strategy_type,
+            campaign.advertising_channel_type,
             campaign.target_cpa.target_cpa_micros,
+            campaign.maximize_conversions.target_cpa_micros,
             campaign.name
         FROM campaign
         WHERE campaign.resource_name = '{campaign_resource_name}'
@@ -213,9 +215,17 @@ def _get_bid_strategy_current(client, customer_id: str, campaign_resource_name: 
         "resource_name": campaign_resource_name,
         "name": c.name,
         "bidding_strategy_type": c.bidding_strategy_type.name,
+        "advertising_channel_type": c.advertising_channel_type.name,
     }
+    # Search carries tCPA on campaign.target_cpa; PMax carries it as a target ON the
+    # MaximizeConversions strategy. Capture whichever is set, or the rollback log will
+    # omit the pre-change target and rollback will silently lose it.
     if c.target_cpa.target_cpa_micros:
         state["target_cpa_inr"] = round(c.target_cpa.target_cpa_micros / 1_000_000, 2)
+    if c.maximize_conversions.target_cpa_micros:
+        state["maximize_conversions_target_cpa_inr"] = round(
+            c.maximize_conversions.target_cpa_micros / 1_000_000, 2
+        )
     return state
 
 
@@ -387,15 +397,29 @@ def set_bid_strategy(
         campaign.target_spend = ts
         mask_field = "target_spend.cpc_bid_ceiling_micros"
     elif strategy == "MAXIMIZE_CONVERSIONS":
-        # NOTE: empty MaximizeConversions has the same masking limitation as TargetSpend.
-        # Set a leaf (e.g. target_roas) before using this branch on API v24.
-        campaign.maximize_conversions = client.get_type("MaximizeConversions")
-        mask_field = "maximize_conversions"
+        # Empty MaximizeConversions has the same masking limitation as TargetSpend — masking
+        # the bare message raises FIELD_HAS_SUBFIELDS on v24, so mask a leaf instead.
+        # target_cpa_micros = 0 means "no target CPA", i.e. plain Maximize Conversions.
+        # This is also the rollback path from TARGET_CPA, so it must stay working.
+        mc = client.get_type("MaximizeConversions")
+        mc.target_cpa_micros = 0
+        campaign.maximize_conversions = mc
+        mask_field = "maximize_conversions.target_cpa_micros"
     elif strategy == "TARGET_CPA":
-        tcpa = client.get_type("TargetCpa")
-        tcpa.target_cpa_micros = round(target_cpa_inr * 1_000_000)
-        campaign.target_cpa = tcpa
-        mask_field = "target_cpa.target_cpa_micros"
+        # PMax has no standalone TARGET_CPA strategy — the API rejects it with
+        # OPERATION_NOT_PERMITTED_FOR_CONTEXT (same class as MAXIMIZE_CLICKS, see C-05).
+        # On PMax a target CPA is a target set ON the MaximizeConversions strategy.
+        # Verified 2026-07-20 via validate_only against PMax-Students-Jun2026.
+        if before["advertising_channel_type"] == "PERFORMANCE_MAX":
+            mc = client.get_type("MaximizeConversions")
+            mc.target_cpa_micros = round(target_cpa_inr * 1_000_000)
+            campaign.maximize_conversions = mc
+            mask_field = "maximize_conversions.target_cpa_micros"
+        else:
+            tcpa = client.get_type("TargetCpa")
+            tcpa.target_cpa_micros = round(target_cpa_inr * 1_000_000)
+            campaign.target_cpa = tcpa
+            mask_field = "target_cpa.target_cpa_micros"
 
     op = client.get_type("CampaignOperation")
     client.copy_from(op.update, campaign)
@@ -406,18 +430,39 @@ def set_bid_strategy(
         f"set_bid_strategy:{before['name']}:{strategy}"
     )
 
-    detail = f" (target CPA: {target_cpa_inr})" if target_cpa_inr else ""
+    # On PMax the bidding_strategy_type does NOT change — a target CPA is a target ON
+    # MaximizeConversions, not a strategy of its own (see C-05). Report what actually
+    # changed rather than what was requested, or the audit trail claims a strategy
+    # switch that never happened and rollback reads from a false record.
+    if before["advertising_channel_type"] == "PERFORMANCE_MAX":
+        effective_strategy = "MAXIMIZE_CONVERSIONS"
+        tcpa_before = before.get("maximize_conversions_target_cpa_inr")
+        tcpa_after = target_cpa_inr if strategy == "TARGET_CPA" else None
+        change_desc = (
+            f"MAXIMIZE_CONVERSIONS (tCPA: "
+            f"{tcpa_before if tcpa_before else 'none'} -> "
+            f"{tcpa_after if tcpa_after else 'none'})"
+        )
+    else:
+        effective_strategy = strategy
+        tcpa_before = before.get("target_cpa_inr")
+        tcpa_after = target_cpa_inr
+        detail = f" (target CPA: {target_cpa_inr})" if target_cpa_inr else ""
+        change_desc = f"{before['bidding_strategy_type']} -> {strategy}{detail}"
+
     _log(
-        f"BID STRATEGY SET: {before['name']} | "
-        f"{before['bidding_strategy_type']} -> {strategy}{detail} | "
+        f"BID STRATEGY SET: {before['name']} | {change_desc} | "
         f"code:{confirmation_code}"
     )
     return {
         "updated": True,
         "campaign": before["name"],
+        "channel_type": before["advertising_channel_type"],
+        "requested_strategy": strategy,
         "before": before["bidding_strategy_type"],
-        "after": strategy,
-        "target_cpa_inr": target_cpa_inr,
+        "after": effective_strategy,
+        "target_cpa_before_inr": tcpa_before,
+        "target_cpa_inr": tcpa_after,
         "code": confirmation_code,
     }
 
